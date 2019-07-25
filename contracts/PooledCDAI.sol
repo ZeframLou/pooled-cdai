@@ -70,7 +70,7 @@ contract PooledCDAI is ERC20, Ownable, ReentrancyGuard {
     return 18;
   }
 
-  function mint(address to, uint256 amount) public returns (bool) {
+  function mint(address to, uint256 amount) public nonReentrant returns (bool) {
     // transfer `amount` DAI from msg.sender
     ERC20 dai = ERC20(DAI_ADDRESS);
     require(dai.transferFrom(msg.sender, address(this), amount), "Failed to transfer DAI from msg.sender");
@@ -81,9 +81,11 @@ contract PooledCDAI is ERC20, Ownable, ReentrancyGuard {
 
     // mint `amount` pcDAI for `to`
     _mint(to, amount);
+
+    return true;
   }
 
-  function burn(address to, uint256 amount) public returns (bool) {
+  function burn(address to, uint256 amount) public nonReentrant returns (bool) {
     // burn `amount` pcDAI for msg.sender
     _burn(msg.sender, amount);
 
@@ -94,6 +96,8 @@ contract PooledCDAI is ERC20, Ownable, ReentrancyGuard {
     // transfer DAI to `to`
     ERC20 dai = ERC20(DAI_ADDRESS);
     require(dai.transfer(to, amount), "Failed to transfer DAI to target");
+
+    return true;
   }
 
   function accruedInterestCurrent() public returns (uint256) {
@@ -117,6 +121,8 @@ contract PooledCDAI is ERC20, Ownable, ReentrancyGuard {
     // transfer DAI to beneficiary
     ERC20 dai = ERC20(DAI_ADDRESS);
     require(dai.transfer(beneficiary, interestAmount), "Failed to transfer DAI to beneficiary");
+
+    return true;
   }
 
   function withdrawInterestInCDAI() public onlyOwner returns (bool) {
@@ -126,10 +132,18 @@ contract PooledCDAI is ERC20, Ownable, ReentrancyGuard {
 
     // transfer cDAI to beneficiary
     require(cDAI.transfer(beneficiary, interestAmountInCDAI), "Failed to transfer cDAI to beneficiary");
+
+    return true;
   }
 
   function setBeneficiary(address newBeneficiary) public onlyOwner returns (bool) {
     require(newBeneficiary != address(0), "Beneficiary can't be zero");
     beneficiary = newBeneficiary;
+
+    return true;
+  }
+
+  function() external payable {
+    revert("Contract doesn't support receiving Ether");
   }
 }
