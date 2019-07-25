@@ -1,0 +1,25 @@
+{
+  "name": "pooled-cdai",
+  "version": "0.0.1",
+  "description": "Pools DAI, converts it into Compound DAI, and sends interests to a beneficiary. Users putting DAI into the pool receives Pooled cDAI (pcDAI), an ERC20 token which is 1-for-1 redeemable for DAI at any time.",
+  "main": "",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "openzeppelin-solidity": "^2.3.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "truffle test"
+  },
+  "keywords": [
+    "ethereum",
+    "compound",
+    "defi",
+    "dai",
+    "makerdao"
+  ],
+  "author": "Zefram Lou",
+  "license": "ISC"
+}
