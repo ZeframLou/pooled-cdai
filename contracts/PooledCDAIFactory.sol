@@ -4,6 +4,8 @@ import "./PooledCDAI.sol";
 
 contract PooledCDAIFactory {
   function createPCDAI(string memory name, string memory symbol, address _beneficiary) public returns (PooledCDAI) {
-    return new PooledCDAI(name, symbol, _beneficiary);
+    PooledCDAI pcDAI = new PooledCDAI(name, symbol, _beneficiary);
+    pcDAI.transferOwnership(msg.sender);
+    return pcDAI;
   }
 }
