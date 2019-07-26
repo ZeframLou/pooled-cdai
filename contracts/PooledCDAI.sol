@@ -2,11 +2,10 @@ pragma solidity >=0.4.21 <0.6.0;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "./interfaces/CERC20.sol";
 import "./interfaces/Comptroller.sol";
 
-contract PooledCDAI is ERC20, Ownable, ReentrancyGuard {
+contract PooledCDAI is ERC20, Ownable {
   uint256 internal constant PRECISION = 10 ** 18;
 
   address public constant COMPTROLLER_ADDRESS = 0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B;
@@ -70,7 +69,7 @@ contract PooledCDAI is ERC20, Ownable, ReentrancyGuard {
     return 18;
   }
 
-  function mint(address to, uint256 amount) public nonReentrant returns (bool) {
+  function mint(address to, uint256 amount) public returns (bool) {
     // transfer `amount` DAI from msg.sender
     ERC20 dai = ERC20(DAI_ADDRESS);
     require(dai.transferFrom(msg.sender, address(this), amount), "Failed to transfer DAI from msg.sender");
@@ -85,7 +84,7 @@ contract PooledCDAI is ERC20, Ownable, ReentrancyGuard {
     return true;
   }
 
-  function burn(address to, uint256 amount) public nonReentrant returns (bool) {
+  function burn(address to, uint256 amount) public returns (bool) {
     // burn `amount` pcDAI for msg.sender
     _burn(msg.sender, amount);
 
