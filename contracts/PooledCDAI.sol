@@ -76,6 +76,8 @@ contract PooledCDAI is ERC20, Ownable {
 
     // use `amount` DAI to mint cDAI
     CERC20 cDAI = CERC20(CDAI_ADDRESS);
+    require(dai.approve(CDAI_ADDRESS, 0), "Failed to clear DAI allowance");
+    require(dai.approve(CDAI_ADDRESS, amount), "Failed to set DAI allowance");
     require(cDAI.mint(amount) == 0, "Failed to mint cDAI");
 
     // mint `amount` pcDAI for `to`
