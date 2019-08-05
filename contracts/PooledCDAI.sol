@@ -17,6 +17,11 @@ contract PooledCDAI is ERC20, Ownable {
 
   address public beneficiary; // the account that will receive the interests from Compound
 
+  event Mint(address indexed sender, address indexed to, uint256 amount);
+  event Burn(address indexed sender, address indexed to, uint256 amount);
+  event WithdrawInterest(address beneficiary, uint256 amount, bool indexed inDAI);
+  event SetBeneficiary(address oldBeneficiary, address newBeneficiary);
+
   /**
     * @dev Sets the values for `name` and `symbol`. Both of
     * these values are immutable: they can only be set once during
@@ -29,6 +34,7 @@ contract PooledCDAI is ERC20, Ownable {
     // Set beneficiary
     require(_beneficiary != address(0), "Beneficiary can't be zero");
     beneficiary = _beneficiary;
+    emit SetBeneficiary(address(0), _beneficiary);
 
     // Enter cDAI market
     Comptroller troll = Comptroller(COMPTROLLER_ADDRESS);
@@ -83,6 +89,9 @@ contract PooledCDAI is ERC20, Ownable {
     // mint `amount` pcDAI for `to`
     _mint(to, amount);
 
+    // emit event
+    emit Mint(msg.sender, to, amount);
+
     return true;
   }
 
@@ -97,6 +106,9 @@ contract PooledCDAI is ERC20, Ownable {
     // transfer DAI to `to`
     ERC20 dai = ERC20(DAI_ADDRESS);
     require(dai.transfer(to, amount), "Failed to transfer DAI to target");
+
+    // emit event
+    emit Burn(msg.sender, to, amount);
 
     return true;
   }
@@ -123,6 +135,8 @@ contract PooledCDAI is ERC20, Ownable {
     ERC20 dai = ERC20(DAI_ADDRESS);
     require(dai.transfer(beneficiary, interestAmount), "Failed to transfer DAI to beneficiary");
 
+    emit WithdrawInterest(beneficiary, interestAmount, true);
+
     return true;
   }
 
@@ -134,11 +148,16 @@ contract PooledCDAI is ERC20, Ownable {
     // transfer cDAI to beneficiary
     require(cDAI.transfer(beneficiary, interestAmountInCDAI), "Failed to transfer cDAI to beneficiary");
 
+    // emit event
+    emit WithdrawInterest(beneficiary, interestAmountInCDAI, false);
+
     return true;
   }
 
   function setBeneficiary(address newBeneficiary) public onlyOwner returns (bool) {
     require(newBeneficiary != address(0), "Beneficiary can't be zero");
+    emit SetBeneficiary(beneficiary, newBeneficiary);
+
     beneficiary = newBeneficiary;
 
     return true;
