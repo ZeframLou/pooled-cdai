@@ -16,13 +16,13 @@ truffle compile
 
 ### Roles
 - Beneficiary: the account that receives the interest
-- Owner: the account that can change the beneficiary and withdraw the interest to the beneficiary, default is the creator of the pcDAI smart contract
+- Owner: the account that can change the beneficiary, default is the creator of the pcDAI smart contract
 - User: accounts that can deposit into/withdraw from the pool (all accounts)
 
 ### Creation
 Call this function in `PooledCDAIFactory`
 
-`function createPCDAI(string memory name, string memory symbol, address _beneficiary) public returns (PooledCDAI)`
+`function createPCDAI(string memory name, string memory symbol, address _beneficiary, bool renounceOwnership) public returns (PooledCDAI)`
 
 ### Usage
 
@@ -36,15 +36,15 @@ Deposit `amount` DAI into pool, send minted pcDAI to `to`
 
 Burn `amount` pcDAI, send redeemed DAI to `to`
 
-#### Owner actions
-
-- `function withdrawInterestInDAI() public onlyOwner returns (bool)`
+- `function withdrawInterestInDAI() public returns (bool)`
 
 Withdraw accrued interest to beneficiary in DAI
 
-- `function withdrawInterestInCDAI() public onlyOwner returns (bool)`
+- `function withdrawInterestInCDAI() public returns (bool)`
 
 Withdraw accrued interest to beneficiary in cDAI
+
+#### Owner actions
 
 - `function setBeneficiary(address newBeneficiary) public onlyOwner returns (bool)`
 
