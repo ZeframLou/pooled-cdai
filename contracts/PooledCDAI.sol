@@ -19,7 +19,7 @@ contract PooledCDAI is ERC20, Ownable {
 
   event Mint(address indexed sender, address indexed to, uint256 amount);
   event Burn(address indexed sender, address indexed to, uint256 amount);
-  event WithdrawInterest(address beneficiary, uint256 amount, bool indexed inDAI);
+  event WithdrawInterest(address indexed sender, address beneficiary, uint256 amount, bool indexed inDAI);
   event SetBeneficiary(address oldBeneficiary, address newBeneficiary);
 
   /**
@@ -123,7 +123,7 @@ contract PooledCDAI is ERC20, Ownable {
     return cDAI.exchangeRateStored().mul(cDAI.balanceOf(address(this))).div(PRECISION).sub(totalSupply());
   }
 
-  function withdrawInterestInDAI() public onlyOwner returns (bool) {
+  function withdrawInterestInDAI() public returns (bool) {
     // calculate amount of interest in DAI
     uint256 interestAmount = accruedInterestCurrent();
 
@@ -135,12 +135,12 @@ contract PooledCDAI is ERC20, Ownable {
     ERC20 dai = ERC20(DAI_ADDRESS);
     require(dai.transfer(beneficiary, interestAmount), "Failed to transfer DAI to beneficiary");
 
-    emit WithdrawInterest(beneficiary, interestAmount, true);
+    emit WithdrawInterest(msg.sender, beneficiary, interestAmount, true);
 
     return true;
   }
 
-  function withdrawInterestInCDAI() public onlyOwner returns (bool) {
+  function withdrawInterestInCDAI() public returns (bool) {
     // calculate amount of cDAI to transfer
     CERC20 cDAI = CERC20(CDAI_ADDRESS);
     uint256 interestAmountInCDAI = accruedInterestCurrent().mul(PRECISION).div(cDAI.exchangeRateCurrent());
@@ -149,7 +149,7 @@ contract PooledCDAI is ERC20, Ownable {
     require(cDAI.transfer(beneficiary, interestAmountInCDAI), "Failed to transfer cDAI to beneficiary");
 
     // emit event
-    emit WithdrawInterest(beneficiary, interestAmountInCDAI, false);
+    emit WithdrawInterest(msg.sender, beneficiary, interestAmountInCDAI, false);
 
     return true;
   }
