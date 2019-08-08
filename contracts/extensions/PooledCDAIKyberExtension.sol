@@ -1,33 +1,32 @@
 pragma solidity >=0.4.21 <0.6.0;
 
-import "./PooledCDAI.sol";
-import "./interfaces/KyberNetworkProxy.sol";
+import "../PooledCDAI.sol";
+import "../interfaces/KyberNetworkProxy.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
 
-contract KyberPooledCDAI is PooledCDAI {
+/**
+  @dev An extension to PooledCDAI that enables minting & burning pcDAI using ETH & ERC20 tokens
+    supported by Kyber Network, rather than just DAI. There's no need to deploy one for each pool,
+    since it uses pcDAI as a black box.
+ */
+contract PooledCDAIKyberExtension {
   using SafeERC20 for ERC20;
+  using SafeERC20 for PooledCDAI;
+  using SafeMath for uint256;
 
+  address public constant DAI_ADDRESS = 0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359;
   address public constant KYBER_ADDRESS = 0x818E6FECD516Ecc3849DAf6845e3EC868087B755;
   ERC20 internal constant ETH_TOKEN_ADDRESS = ERC20(0x00eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee);
-  bytes internal constant PERM_HINT = "PERM";
+  bytes internal constant PERM_HINT = "PERM"; // Only use permissioned reserves from Kyber
   uint internal constant MAX_QTY   = (10**28); // 10B tokens
 
-  function mintWithETH(address to) public payable returns (bool) {
-    // convert ETH to DAI
+  function mintWithETH(PooledCDAI pcDAI, address to) public payable returns (bool) {
+    // convert `msg.value` ETH to DAI
     ERC20 dai = ERC20(DAI_ADDRESS);
     (uint256 actualDAIAmount, uint256 actualETHAmount) = _kyberTrade(ETH_TOKEN_ADDRESS, msg.value, dai);
 
-    // use `actualDAIAmount` DAI to mint cDAI
-    CERC20 cDAI = CERC20(CDAI_ADDRESS);
-    require(dai.approve(CDAI_ADDRESS, 0), "Failed to clear DAI allowance");
-    require(dai.approve(CDAI_ADDRESS, actualDAIAmount), "Failed to set DAI allowance");
-    require(cDAI.mint(actualDAIAmount) == 0, "Failed to mint cDAI");
-
-    // mint `actualDAIAmount` pcDAI for `to`
-    _mint(to, actualDAIAmount);
-
-    // emit event
-    emit Mint(msg.sender, to, actualDAIAmount);
+    // mint `actualDAIAmount` pcDAI
+    _mint(pcDAI, to, actualDAIAmount);
 
     // return any leftover ETH
     if (actualETHAmount < msg.value) {
@@ -37,29 +36,20 @@ contract KyberPooledCDAI is PooledCDAI {
     return true;
   }
 
-  function mintWithToken(address to, address tokenAddress, uint256 amount) public returns (bool) {
+  function mintWithToken(PooledCDAI pcDAI, address tokenAddress, address to, uint256 amount) public returns (bool) {
     require(tokenAddress != address(ETH_TOKEN_ADDRESS), "Use mintWithETH() instead");
     require(tokenAddress != DAI_ADDRESS, "Use mint() instead");
 
-    // transfer token to pool
+    // transfer `amount` token from msg.sender
     ERC20 token = ERC20(tokenAddress);
     token.safeTransferFrom(msg.sender, address(this), amount);
 
-    // convert token to DAI
+    // convert `amount` token to DAI
     ERC20 dai = ERC20(DAI_ADDRESS);
     (uint256 actualDAIAmount, uint256 actualTokenAmount) = _kyberTrade(token, amount, dai);
 
-    // use `actualDAIAmount` DAI to mint cDAI
-    CERC20 cDAI = CERC20(CDAI_ADDRESS);
-    require(dai.approve(CDAI_ADDRESS, 0), "Failed to clear DAI allowance");
-    require(dai.approve(CDAI_ADDRESS, actualDAIAmount), "Failed to set DAI allowance");
-    require(cDAI.mint(actualDAIAmount) == 0, "Failed to mint cDAI");
-
-    // mint `actualDAIAmount` pcDAI for `to`
-    _mint(to, actualDAIAmount);
-
-    // emit event
-    emit Mint(msg.sender, to, actualDAIAmount);
+    // mint `actualDAIAmount` pcDAI
+    _mint(pcDAI, to, actualDAIAmount);
 
     // return any leftover tokens
     if (actualTokenAmount < amount) {
@@ -69,60 +59,61 @@ contract KyberPooledCDAI is PooledCDAI {
     return true;
   }
 
-  function burnToETH(address payable to, uint256 amount) public returns (bool) {
-    // burn `amount` pcDAI for msg.sender
-    _burn(msg.sender, amount);
+  function burnToETH(PooledCDAI pcDAI, address payable to, uint256 amount) public returns (bool) {
+    // burn `amount` pcDAI for msg.sender to get DAI
+    _burn(pcDAI, amount);
 
-    // burn cDAI for `amount` DAI
-    CERC20 cDAI = CERC20(CDAI_ADDRESS);
-    require(cDAI.redeemUnderlying(amount) == 0, "Failed to redeem");
-
-    // convert DAI to ETH
+    // convert `amount` DAI to ETH
     ERC20 dai = ERC20(DAI_ADDRESS);
     (uint256 actualETHAmount, uint256 actualDAIAmount) = _kyberTrade(dai, amount, ETH_TOKEN_ADDRESS);
 
-    // transfer ETH to `to`
+    // transfer `actualETHAmount` ETH to `to`
     to.transfer(actualETHAmount);
-
-    // emit event
-    emit Burn(msg.sender, to, actualDAIAmount);
 
     // transfer any leftover DAI
     if (actualDAIAmount < amount) {
-      require(dai.transfer(msg.sender, amount.sub(actualDAIAmount)), "Failed to return leftover DAI");
+      dai.safeTransfer(msg.sender, amount.sub(actualDAIAmount));
     }
 
     return true;
   }
 
-  function burnToToken(address to, address tokenAddress, uint256 amount) public returns (bool) {
+  function burnToToken(PooledCDAI pcDAI, address tokenAddress, address to, uint256 amount) public returns (bool) {
     require(tokenAddress != address(ETH_TOKEN_ADDRESS), "Use burnToETH() instead");
     require(tokenAddress != DAI_ADDRESS, "Use burn() instead");
 
-    // burn `amount` pcDAI for msg.sender
-    _burn(msg.sender, amount);
+    // burn `amount` pcDAI for msg.sender to get DAI
+    _burn(pcDAI, amount);
 
-    // burn cDAI for `amount` DAI
-    CERC20 cDAI = CERC20(CDAI_ADDRESS);
-    require(cDAI.redeemUnderlying(amount) == 0, "Failed to redeem");
-
-    // convert DAI to token
+    // convert `amount` DAI to token
     ERC20 dai = ERC20(DAI_ADDRESS);
     ERC20 token = ERC20(tokenAddress);
     (uint256 actualTokenAmount, uint256 actualDAIAmount) = _kyberTrade(dai, amount, token);
 
-    // transfer token to `to`
+    // transfer `actualTokenAmount` token to `to`
     token.safeTransfer(to, actualTokenAmount);
-
-    // emit event
-    emit Burn(msg.sender, to, actualDAIAmount);
 
     // transfer any leftover DAI
     if (actualDAIAmount < amount) {
-      require(dai.transfer(msg.sender, amount.sub(actualDAIAmount)), "Failed to return leftover DAI");
+      dai.safeTransfer(msg.sender, amount.sub(actualDAIAmount));
     }
 
     return true;
+  }
+
+  function _mint(PooledCDAI pcDAI, address to, uint256 actualDAIAmount) internal {
+    ERC20 dai = ERC20(DAI_ADDRESS);
+    dai.safeApprove(address(pcDAI), 0);
+    dai.safeApprove(address(pcDAI), actualDAIAmount);
+    require(pcDAI.mint(to, actualDAIAmount), "Failed to mint pcDAI");
+  }
+
+  function _burn(PooledCDAI pcDAI, uint256 amount) internal {
+    // transfer `amount` pcDAI from msg.sender
+    pcDAI.safeTransferFrom(msg.sender, address(this), amount);
+
+    // burn `amount` pcDAI for DAI
+    require(pcDAI.burn(address(this), amount), "Failed to burn pcDAI");
   }
 
   /**
@@ -136,6 +127,10 @@ contract KyberPooledCDAI is PooledCDAI {
       return uint256(_addr.balance);
     }
     return uint256(_token.balanceOf(_addr));
+  }
+
+  function _toPayableAddr(address _addr) internal pure returns (address payable) {
+    return address(uint160(_addr));
   }
 
   /**
@@ -173,7 +168,7 @@ contract KyberPooledCDAI is PooledCDAI {
       _srcToken,
       _srcAmount,
       _destToken,
-      address(this),
+      _toPayableAddr(address(this)),
       MAX_QTY,
       rate,
       address(0),
