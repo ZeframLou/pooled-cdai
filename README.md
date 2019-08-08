@@ -59,3 +59,12 @@ Calculates the current accrued interest. It's not a `view` function, since it up
 - `function accruedInterestStored() public view returns (uint256)`
 
 Calculates the current accrued interest. It's a `view` function, but it uses the cDAI exchange rate at the last call to the cDAI smart contract, so it might not be up to date.
+
+## Extensions
+
+Extensions are smart contracts that extend the features of Pooled cDAI.
+
+### Kyber Network
+
+* Location: `contracts/extensions/PooledCDAIKyberExtension.sol`
+* Description: Enables minting & burning pcDAI using ETH & ERC20 tokens supported by Kyber Network, rather than just DAI. There's no need to deploy one for each pool, since it uses pcDAI as a black box.
