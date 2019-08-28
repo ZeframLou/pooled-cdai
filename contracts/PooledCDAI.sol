@@ -27,7 +27,9 @@ contract PooledCDAI is ERC20, Ownable {
     * these values are immutable: they can only be set once during
     * construction.
     */
-  constructor (string memory name, string memory symbol, address _beneficiary) public {
+  function init(string memory name, string memory symbol, address _beneficiary) public onlyOwner {
+    require(beneficiary == address(0), "Already initialized");
+
     _name = name;
     _symbol = symbol;
 
