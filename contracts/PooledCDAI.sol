@@ -27,7 +27,7 @@ contract PooledCDAI is ERC20, Ownable {
     * these values are immutable: they can only be set once during
     * construction.
     */
-  function init(string memory name, string memory symbol, address _beneficiary) public onlyOwner {
+  function init(string memory name, string memory symbol, address _beneficiary) public {
     require(beneficiary == address(0), "Already initialized");
 
     _name = name;
@@ -37,6 +37,8 @@ contract PooledCDAI is ERC20, Ownable {
     require(_beneficiary != address(0), "Beneficiary can't be zero");
     beneficiary = _beneficiary;
     emit SetBeneficiary(address(0), _beneficiary);
+
+    _transferOwnership(msg.sender);
 
     // Enter cDAI market
     Comptroller troll = Comptroller(COMPTROLLER_ADDRESS);

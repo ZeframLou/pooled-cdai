@@ -5,6 +5,8 @@ import "./PooledCDAIFactory.sol";
 contract MetadataPooledCDAIFactory is PooledCDAIFactory {
   event CreatePoolWithMetadata(address sender, address pool, bool indexed renounceOwnership, bytes metadata);
 
+  constructor(address _libraryAddress) public PooledCDAIFactory(_libraryAddress) {}
+
   function createPCDAIWithMetadata(
     string memory name,
     string memory symbol,
