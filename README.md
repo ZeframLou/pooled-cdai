@@ -70,3 +70,11 @@ Extensions are smart contracts that extend the features of Pooled cDAI.
 
 * Location: `contracts/extensions/PooledCDAIKyberExtension.sol`
 * Description: Enables minting & burning pcDAI using ETH & ERC20 tokens supported by Kyber Network, rather than just DAI. There's no need to deploy one for each pool, since it uses pcDAI as a black box.
+
+## Deployments
+
+### Mainnet
+
+- PooledCDAI template: 0x65b8301169e689EB785596148063E0e7fB74c7f4
+- MetadataPooledCDAIFactory: 0xd91d45e8f0de4ac5edefe4dc9425a808eb13a324
+- Kyber extension: 0x04deb44ac536ed288ab3ddb7d69920e7002965f1
