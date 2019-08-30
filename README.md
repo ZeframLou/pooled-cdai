@@ -1,5 +1,7 @@
 # Pooled cDAI (pcDAI)
 Pools DAI, converts it into Compound DAI (cDAI), and sends interests to a beneficiary. Users putting DAI into the pool receives Pooled cDAI (pcDAI), an ERC20 token which is 1-for-1 redeemable for DAI at any time.
+- [Pool DAI (web interface for pcDAI)](https://zeframlou.github.io/pool-dai/)
+- [The Graph subgraph](https://github.com/ZeframLou/pooled-cdai-subgraph)
 
 ## How it works
 Compound accrues interest to cDAI by increasing `exchangeRate`, the amount of DAI you can redeem per cDAI. Therefore, you can calculate the current DAI value of the pool's cDAI using `exchangeRate * poolCDAIBalance`. To calculate the interest, simply subtract the total DAI deposited from that value: `exchangeRate * poolCDAIBalance - totalDAIDeposited`. pcDAI records the total deposit using `totalSupply`, since pcDAI is 1-for-1 redeemable for DAI.
