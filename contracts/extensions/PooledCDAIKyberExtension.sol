@@ -181,4 +181,6 @@ contract PooledCDAIKyberExtension {
 
     _actualSrcAmount = beforeSrcBalance.sub(_getBalance(_srcToken, address(this)));
   }
+
+  function() external payable {}
 }
