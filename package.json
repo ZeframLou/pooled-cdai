@@ -9,9 +9,12 @@
   "dependencies": {
     "openzeppelin-solidity": "^2.3.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "solhint": "^2.3.0"
+  },
   "scripts": {
-    "test": "truffle test"
+    "test": "truffle test",
+    "lint": "solhint contracts/**/*.sol"
   },
   "keywords": [
     "ethereum",
