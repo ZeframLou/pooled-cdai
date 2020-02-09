@@ -1,3 +1,5 @@
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/ZeframLou/pooled-cdai) 
+
 # Pooled cDAI (pcDAI)
 Pools DAI, converts it into Compound DAI (cDAI), and sends interests to a beneficiary. Users putting DAI into the pool receives Pooled cDAI (pcDAI), an ERC20 token which is 1-for-1 redeemable for DAI at any time.
 - [Pool DAI (web interface for pcDAI)](https://zeframlou.github.io/pool-dai/)
