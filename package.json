@@ -7,11 +7,17 @@
     "test": "test"
   },
   "dependencies": {
-    "openzeppelin-solidity": "^2.3.0"
+    "@openzeppelin/contracts": "^2.5.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@nomiclabs/buidler": "^1.2.0",
+    "@nomiclabs/buidler-truffle5": "^1.2.0",
+    "@nomiclabs/buidler-web3": "^1.2.0",
+    "bignumber.js": "^9.0.0",
+    "web3": "^1.2.6"
+  },
   "scripts": {
-    "test": "truffle test"
+    "test": "npx buidler test"
   },
   "keywords": [
     "ethereum",

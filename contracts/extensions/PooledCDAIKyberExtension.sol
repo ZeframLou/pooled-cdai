@@ -1,8 +1,8 @@
-pragma solidity >=0.4.21 <0.6.0;
+pragma solidity 0.5.17;
 
 import "../PooledCDAI.sol";
 import "../interfaces/KyberNetworkProxy.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
 /**
   @dev An extension to PooledCDAI that enables minting & burning pcDAI using ETH & ERC20 tokens
