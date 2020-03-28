@@ -13,6 +13,7 @@ contract PooledCDAI is ERC20, Ownable {
     using SafeMath for uint256;
 
     uint256 internal constant PRECISION = 10**18;
+    uint256 internal constant ERR_CODE_OK = 0;
 
     CERC20 public constant cDAI = CERC20(
         0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643
@@ -107,7 +108,7 @@ contract PooledCDAI is ERC20, Ownable {
 
         // use `amount` DAI to mint cDAI
         dai.safeApprove(address(cDAI), amount);
-        require(cDAI.mint(amount) == 0, "Failed to mint cDAI");
+        require(cDAI.mint(amount) == ERR_CODE_OK, "Failed to mint cDAI");
 
         // mint `amount` pcDAI for `to`
         _mint(to, amount);
@@ -123,7 +124,7 @@ contract PooledCDAI is ERC20, Ownable {
         _burn(msg.sender, amount);
 
         // burn cDAI for `amount` DAI
-        require(cDAI.redeemUnderlying(amount) == 0, "Failed to redeem");
+        require(cDAI.redeemUnderlying(amount) == ERR_CODE_OK, "Failed to redeem");
 
         // transfer DAI to `to`
         dai.safeTransfer(to, amount);
@@ -157,7 +158,7 @@ contract PooledCDAI is ERC20, Ownable {
         uint256 interestAmount = accruedInterestCurrent();
 
         // burn cDAI
-        require(cDAI.redeemUnderlying(interestAmount) == 0, "Failed to redeem");
+        require(cDAI.redeemUnderlying(interestAmount) == ERR_CODE_OK, "Failed to redeem");
 
         // transfer DAI to beneficiaries
         uint256 transferAmount = 0;

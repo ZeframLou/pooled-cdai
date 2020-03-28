@@ -12,7 +12,10 @@ async function main() {
     // Deploy PooledCDAI template
     const template = await PooledCDAI.new();
     console.log(`Deployed PooledCDAI at ${template.address}`);
-    await template.init("", "", accounts[0]);
+    await template.init("", "", [{
+        dest: accounts[0],
+        weight: 100
+    }]);
     console.log('Initialized PooledCDAI template');
 
     // Deploy factory
