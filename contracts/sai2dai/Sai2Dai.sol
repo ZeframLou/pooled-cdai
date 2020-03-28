@@ -54,7 +54,11 @@ contract Sai2Dai is Ownable {
                 weight: DEV_WEIGHT
             });
             pDAI = factory.createPCDAI(pSAI.name(), pSAI.symbol(), beneficiaries, false);
-            pDAI.transferOwnership(pSAI.owner());
+            if (pSAI.owner() == address(0)) {
+                pDAI.renounceOwnership();
+            } else {
+                pDAI.transferOwnership(pSAI.owner());
+            }
             pSAI2pDAI[pSAIAddress] = address(pDAI);
         } else {
             pDAI = PooledCDAI(pSAI2pDAI[pSAIAddress]);
