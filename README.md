@@ -17,14 +17,14 @@ truffle compile
 ## Technical details
 
 ### Roles
-- Beneficiary: the account that receives the interest
+- Beneficiaries: the accounts that receives the interest
 - Owner: the account that can change the beneficiary, default is the creator of the pcDAI smart contract
 - User: accounts that can deposit into/withdraw from the pool (all accounts)
 
 ### Creation
 Call this function in `PooledCDAIFactory`
 
-`function createPCDAI(string memory name, string memory symbol, address _beneficiary, bool renounceOwnership) public returns (PooledCDAI)`
+`function createPCDAI(string calldata name, string calldata symbol, PooledCDAI.Beneficiary[] calldata beneficiaries, bool renounceOwnership) external returns (PooledCDAI)`
 
 ### Usage
 
@@ -42,13 +42,9 @@ Burn `amount` pcDAI, send redeemed DAI to `to`
 
 Withdraw accrued interest to beneficiary in DAI
 
-- `function withdrawInterestInCDAI() public returns (bool)`
-
-Withdraw accrued interest to beneficiary in cDAI
-
 #### Owner actions
 
-- `function setBeneficiary(address newBeneficiary) public onlyOwner returns (bool)`
+- `function setBeneficiaries(Beneficiary[] calldata newBeneficiaries) external onlyOwner returns (bool)`
 
 Change the beneficiary to `newBeneficiary`
 
@@ -75,6 +71,7 @@ Extensions are smart contracts that extend the features of Pooled cDAI.
 
 ### Mainnet
 
-- PooledCDAI template: 0x65b8301169e689EB785596148063E0e7fB74c7f4
-- MetadataPooledCDAIFactory: 0xd91d45e8f0de4ac5edefe4dc9425a808eb13a324
-- Kyber extension: 0x04deb44ac536ed288ab3ddb7d69920e7002965f1
+- PooledCDAI template: 0x3D6d83649939bAA953ddC589d2d5Db775Df91520
+- MetadataPooledCDAIFactory: 0xB72B4B94d1eD3Cc382D5beEEfE3d03dd55Ad8229
+- Kyber extension: 0x44FBF73a97cf50640A3208b883F810F730D80c2B
+- Sai2Dai migration contract: 0x02c9e4174E9D23BB7619c83Ef5f771fCB1E6FDB8
