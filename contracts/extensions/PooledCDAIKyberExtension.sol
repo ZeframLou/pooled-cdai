@@ -15,7 +15,7 @@ contract PooledCDAIKyberExtension {
     using SafeERC20 for PooledCDAI;
     using SafeMath for uint256;
 
-    address public constant DAI_ADDRESS = 0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359;
+    address public constant DAI_ADDRESS = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
     address public constant KYBER_ADDRESS = 0x818E6FECD516Ecc3849DAf6845e3EC868087B755;
     ERC20 internal constant ETH_TOKEN_ADDRESS = ERC20(
         0x00eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee

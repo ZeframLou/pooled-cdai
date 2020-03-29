@@ -2,7 +2,6 @@ const env = require("@nomiclabs/buidler");
 const BigNumber = require("bignumber.js");
 
 async function main() {
-    await env.run("compile");
     const accounts = await env.web3.eth.getAccounts();
 
     const PooledCDAI = env.artifacts.require("PooledCDAI");
