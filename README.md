@@ -1,6 +1,6 @@
 # Pooled cDAI (pcDAI)
 Pools DAI, converts it into Compound DAI (cDAI), and sends interests to a beneficiary. Users putting DAI into the pool receives Pooled cDAI (pcDAI), an ERC20 token which is 1-for-1 redeemable for DAI at any time.
-- [Pool DAI (web interface for pcDAI)](https://zeframlou.github.io/pool-dai/)
+- [Pool DAI (web interface for pcDAI)](https://zeframlou.github.io/pooldai/)
 - [The Graph subgraph](https://github.com/ZeframLou/pooled-cdai-subgraph)
 
 ## How it works
